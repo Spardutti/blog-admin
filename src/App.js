@@ -7,7 +7,10 @@ import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
 
 function App() {
+  //GET JWT TOKEN
   const [token, setToken] = useState();
+  //GET THE DATA OF A SINGLEPOST
+  const [singlePost, setSinglePost] = useState();
 
   const getLocalToken = () => {
     if (localStorage.getItem("token")) {
@@ -30,11 +33,15 @@ function App() {
   return (
     <BrowserRouter>
       <div>
-        <Header />
+        <Header setSinglePost={setSinglePost} />
       </div>
       <Switch>
         <Route exact path="/">
-          <Home token={token} />
+          <Home
+            token={token}
+            singlePost={singlePost}
+            setSinglePost={setSinglePost}
+          />
         </Route>
         <Route path="/login">
           <Login setToken={setToken} />

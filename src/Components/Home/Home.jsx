@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import "./home.css";
+import SinglePost from "../SinglePost/SinglePost";
 
 const Home = (props) => {
   const [posts, setPosts] = useState();
@@ -23,17 +25,35 @@ const Home = (props) => {
     }
   };
 
+  const displaySinglePost = async (e) => {
+    let id = e.target.id;
+    const response = await fetch("/blog/" + id);
+    const data = await response.json();
+    props.setSinglePost(data);
+  };
+
   useEffect(() => {
     getPosts();
   }, []);
 
-  return posts ? (
+  return props.singlePost ? (
+    <SinglePost singlePost={props.singlePost} />
+  ) : posts ? (
     posts.map((post) => {
       return (
-        <div key={post._id} className="post-container">
+        <div
+          onClick={displaySinglePost}
+          key={post._id}
+          id={post._id}
+          className="post-container"
+        >
           <h1>{post.title}</h1>
-          <p>{post.text}</p>
-          {posts.published ? <p>publicado</p> : <p>no publicado</p>}
+          <p className="text-container">{post.text}</p>
+          {posts.published ? (
+            <p className="public">publicado</p>
+          ) : (
+            <p className="private">no publicado</p>
+          )}
         </div>
       );
     })
