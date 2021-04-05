@@ -1,0 +1,19 @@
+.header-container {
+  background-color: black;
+  height: 150px;
+  padding: 10px;
+  color: wheat;
+  text-align: center;
+}
+
+.nav-bts {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
