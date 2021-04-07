@@ -4,11 +4,11 @@ import SinglePost from "../SinglePost/SinglePost";
 
 const Home = (props) => {
   const [posts, setPosts] = useState();
+  const [published, setPublished] = useState();
 
   const getPosts = async () => {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log("got token");
       const response = await fetch("/admin/blog/all", {
         method: "GET",
         headers: {
@@ -20,8 +20,6 @@ const Home = (props) => {
       if (data) {
         setPosts(data);
       }
-    } else {
-      console.log("no token");
     }
   };
 
@@ -40,6 +38,7 @@ const Home = (props) => {
     <SinglePost singlePost={props.singlePost} />
   ) : posts ? (
     posts.map((post) => {
+      //TODO change the button color if the post is public or not
       return (
         <div
           onClick={displaySinglePost}
@@ -49,7 +48,7 @@ const Home = (props) => {
         >
           <h1>{post.title}</h1>
           <p className="text-container">{post.text}</p>
-          {posts.published ? (
+          {published ? (
             <p className="public">publicado</p>
           ) : (
             <p className="private">no publicado</p>
