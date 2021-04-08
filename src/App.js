@@ -5,12 +5,11 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "./Components/Login/Login";
 import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
+import SinglePost from "./Components/SinglePost/SinglePost";
 
 function App() {
   //GET JWT TOKEN
   const [token, setToken] = useState();
-  //GET THE DATA OF A SINGLEPOST
-  const [singlePost, setSinglePost] = useState();
 
   const getLocalToken = () => {
     if (localStorage.getItem("token")) {
@@ -33,19 +32,16 @@ function App() {
   return (
     <BrowserRouter>
       <div>
-        <Header setSinglePost={setSinglePost} />
+        <Header />
       </div>
       <Switch>
         <Route exact path="/">
-          <Home
-            token={token}
-            singlePost={singlePost}
-            setSinglePost={setSinglePost}
-          />
+          <Home token={token} />
         </Route>
         <Route path="/login">
           <Login setToken={setToken} />
         </Route>
+        <Route path="/post" component={SinglePost} />
       </Switch>
     </BrowserRouter>
   );

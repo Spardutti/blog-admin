@@ -1,11 +1,37 @@
 import "./singlePost.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Switch } from "react-router";
 
 const SinglePost = (props) => {
-  const [title, setTitle] = useState(props.singlePost.title);
-  const [text, setText] = useState(props.singlePost.text);
-  const [published, setPublished] = useState(props.singlePost.published);
-  /*TODO fetch the data to update the post status public or not */
+  const { postId } = props.location.state;
+  const [postData, setPostData] = useState();
+  const [title, setTitle] = useState();
+  const [text, setText] = useState();
+  const [published, setPublished] = useState();
+
+  /*TODO fSAVE THE NO POST*/
+
+  const getSinglePost = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const response = await fetch("/blog/" + postId, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      setPostData(data);
+      setPublished(data.published);
+      setTitle(data.title);
+      setText(data.text);
+    }
+  };
+
+  useEffect(() => {
+    getSinglePost();
+  }, []);
 
   const changeTitle = (e) => {
     setTitle(e.target.value);
@@ -14,19 +40,29 @@ const SinglePost = (props) => {
 
   const changeText = (e) => {
     setText(e.target.value);
-    console.log(TextTrackCueList);
   };
 
   const changeStatus = async () => {
-    const response = await fetch("/admin/" + props.singlePost._id + "/public", {
+    const response = await fetch("/admin/" + postId + "/public", {
       method: "PUT",
     });
     const data = await response.json();
-    setPublished(!published);
+    setPublished(data.published);
+  };
+
+  const savePost = async (e) => {
+    e.preventDefault();
+    const resposne = await fetch(`/admin/${postId}/edit`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer ",
+      },
+    });
+    const data = await resposne.json();
     console.log(data);
   };
 
-  return (
+  return postData ? (
     <div className="singlepost-container">
       <div>
         <h4>Here you can Edit your post title, text and make it public</h4>
@@ -43,6 +79,7 @@ const SinglePost = (props) => {
           value={text}
           className="singlepost-text"
         />
+        <p>Click to Change Status</p>
 
         {published ? (
           <p onClick={changeStatus} className="public">
@@ -53,9 +90,16 @@ const SinglePost = (props) => {
             no publicado
           </p>
         )}
-        <input type="submit" value="Save" className="save-post" />
+        <input
+          type="submit"
+          onClick={savePost}
+          value="Save"
+          className="save-post"
+        />
       </form>
     </div>
+  ) : (
+    <div>loading</div>
   );
 };
 
