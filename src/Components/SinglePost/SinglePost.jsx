@@ -1,19 +1,24 @@
 import "./singlePost.css";
 import { useState, useEffect } from "react";
-import { Switch } from "react-router";
+import { useHistory } from "react-router-dom";
+import { Spinner, Button } from "reactstrap";
 
 const SinglePost = (props) => {
   const { postId } = props.location.state;
   const [postData, setPostData] = useState();
-  const [title, setTitle] = useState();
-  const [text, setText] = useState();
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
   const [published, setPublished] = useState();
+  const [token, setToken] = useState();
 
-  /*TODO fSAVE THE NO POST*/
+  let history = useHistory();
+
+  //GET THE SINGLE POST DATA WHEN CLICKED
 
   const getSinglePost = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const localToken = localStorage.getItem("token");
+    if (localToken) {
+      setToken(localToken);
       const response = await fetch("/blog/" + postId, {
         method: "GET",
         headers: {
@@ -35,13 +40,12 @@ const SinglePost = (props) => {
 
   const changeTitle = (e) => {
     setTitle(e.target.value);
-    console.log(title);
   };
 
   const changeText = (e) => {
     setText(e.target.value);
   };
-
+  //CHANGE THE POST STATUS TO PUBLISHED OR UNPUBLISHED
   const changeStatus = async () => {
     const response = await fetch("/admin/" + postId + "/public", {
       method: "PUT",
@@ -50,16 +54,36 @@ const SinglePost = (props) => {
     setPublished(data.published);
   };
 
+  //SAVE THE POST WITH THE CHANGES
   const savePost = async (e) => {
     e.preventDefault();
-    const resposne = await fetch(`/admin/${postId}/edit`, {
+    const response = await fetch(`/admin/${postId}/edit`, {
       method: "PUT",
+      body: JSON.stringify({
+        title: title,
+        text: text,
+      }),
       headers: {
-        Authorization: "Bearer ",
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
       },
     });
-    const data = await resposne.json();
-    console.log(data);
+    if (response.status === 200) {
+      history.push("/");
+    }
+  };
+
+  //DELETE THE CURRENT POST
+  const deletePost = async () => {
+    const response = await fetch("/admin/" + postId + "/delete", {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    if (response.status === 200) {
+      history.push("/");
+    }
   };
 
   return postData ? (
@@ -75,6 +99,7 @@ const SinglePost = (props) => {
           value={title}
         />
         <textarea
+          rows="10"
           onChange={changeText}
           value={text}
           className="singlepost-text"
@@ -90,6 +115,11 @@ const SinglePost = (props) => {
             no publicado
           </p>
         )}
+        <div>
+          <Button onClick={deletePost} color="danger">
+            Delete{" "}
+          </Button>
+        </div>
         <input
           type="submit"
           onClick={savePost}
@@ -99,7 +129,9 @@ const SinglePost = (props) => {
       </form>
     </div>
   ) : (
-    <div>loading</div>
+    <div className="spinner">
+      <Spinner color="primary" />
+    </div>
   );
 };
 

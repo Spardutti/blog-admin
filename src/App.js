@@ -6,6 +6,7 @@ import Login from "./Components/Login/Login";
 import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
 import SinglePost from "./Components/SinglePost/SinglePost";
+import CreatePost from "./Components/CreatePost/CreatePost";
 
 function App() {
   //GET JWT TOKEN
@@ -42,6 +43,7 @@ function App() {
           <Login setToken={setToken} />
         </Route>
         <Route path="/post" component={SinglePost} />
+        <Route path="/create" component={CreatePost} />
       </Switch>
     </BrowserRouter>
   );

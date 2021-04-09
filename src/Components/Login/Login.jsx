@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./login.css";
 import { useHistory } from "react-router-dom";
+import { Form, FormGroup, Input, Button, Label, Col } from "reactstrap";
 
 const Login = (props) => {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
+  const [errors, setErrors] = useState();
 
   const getUsername = (e) => {
     setUsername(e.target.value);
@@ -29,27 +31,44 @@ const Login = (props) => {
       },
     });
     const data = await response.json();
-    props.setToken(data.token);
-    localStorage.setItem("token", data.token);
-    history.push("/");
+    if (data) {
+      props.setToken(data.token);
+      localStorage.setItem("token", data.token);
+      history.push("/");
+    } else setErrors("Invalid username or password");
   };
 
   return (
-    <form className="login-form">
-      <input
-        onChange={getUsername}
-        type="text"
-        name="username"
-        placeholder="Username"
-      />
-      <input
-        onChange={getPassword}
-        type="password"
-        name="password"
-        placeholder="Password"
-      />
-      <input onClick={login} type="submit" value="Login" />
-    </form>
+    <Form className="login-form mt-5 mx-auto">
+      <Col sm={6} className="mx-auto">
+        <FormGroup>
+          <Label>Enter username</Label>
+          <Input
+            onChange={getUsername}
+            type="text"
+            name="username"
+            placeholder="Username"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>Enter Password</Label>
+          <Input
+            onChange={getPassword}
+            type="password"
+            name="password"
+            placeholder="Password"
+          />
+        </FormGroup>
+        <Button onClick={login} type="submit" color="success">
+          Log in
+        </Button>
+        {errors ? (
+          <FormGroup className="mt-4">
+            <Label>{errors}</Label>
+          </FormGroup>
+        ) : null}
+      </Col>
+    </Form>
   );
 };
 
