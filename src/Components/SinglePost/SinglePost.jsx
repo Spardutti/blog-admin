@@ -1,6 +1,6 @@
 import "./singlePost.css";
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Redirect } from "react-router-dom";
 import { Spinner, Button } from "reactstrap";
 
 const SinglePost = (props) => {
@@ -10,6 +10,7 @@ const SinglePost = (props) => {
   const [text, setText] = useState("");
   const [published, setPublished] = useState();
   const [token, setToken] = useState();
+  const [postSave, setPostSave] = useState();
 
   let history = useHistory();
 
@@ -19,13 +20,16 @@ const SinglePost = (props) => {
     const localToken = localStorage.getItem("token");
     if (localToken) {
       setToken(localToken);
-      const response = await fetch("/blog/" + postId, {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://warm-ravine-05729.herokuapp.com/blog/" + postId,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await response.json();
       setPostData(data);
       setPublished(data.published);
@@ -47,9 +51,12 @@ const SinglePost = (props) => {
   };
   //CHANGE THE POST STATUS TO PUBLISHED OR UNPUBLISHED
   const changeStatus = async () => {
-    const response = await fetch("/admin/" + postId + "/public", {
-      method: "PUT",
-    });
+    const response = await fetch(
+      "https://warm-ravine-05729.herokuapp.com/admin/" + postId + "/public",
+      {
+        method: "PUT",
+      }
+    );
     const data = await response.json();
     setPublished(data.published);
   };
@@ -57,77 +64,87 @@ const SinglePost = (props) => {
   //SAVE THE POST WITH THE CHANGES
   const savePost = async (e) => {
     e.preventDefault();
-    const response = await fetch(`/admin/${postId}/edit`, {
-      method: "PUT",
-      body: JSON.stringify({
-        title: title,
-        text: text,
-      }),
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `https://warm-ravine-05729.herokuapp.com/admin/${postId}/edit`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          title: title,
+          text: text,
+        }),
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (response.status === 200) {
-      history.push("/");
+      setPostSave(true);
     }
   };
 
   //DELETE THE CURRENT POST
   const deletePost = async () => {
-    const response = await fetch("/admin/" + postId + "/delete", {
-      method: "DELETE",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const response = await fetch(
+      "https://warm-ravine-05729.herokuapp.com/admin/" + postId + "/delete",
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     if (response.status === 200) {
       history.push("/");
     }
   };
 
   return postData ? (
-    <div className="singlepost-container">
-      <div>
-        <h4>Here you can Edit your post title, text and make it public</h4>
-      </div>
-      <form action="">
-        <input
-          className="title"
-          type="text"
-          onChange={changeTitle}
-          value={title}
-        />
-        <textarea
-          rows="10"
-          onChange={changeText}
-          value={text}
-          className="singlepost-text"
-        />
-        <p>Click to Change Status</p>
-
-        {published ? (
-          <p onClick={changeStatus} className="public">
-            publicado
-          </p>
-        ) : (
-          <p onClick={changeStatus} className="private">
-            no publicado
-          </p>
-        )}
+    postSave ? (
+      <Redirect to="/" />
+    ) : (
+      <div className="singlepost-container">
         <div>
-          <Button onClick={deletePost} color="danger">
-            Delete{" "}
-          </Button>
+          <h4>Here you can Edit your post title, text and make it public</h4>
         </div>
-        <input
-          type="submit"
-          onClick={savePost}
-          value="Save"
-          className="save-post"
-        />
-      </form>
-    </div>
+        <form action="">
+          <input
+            className="title"
+            type="text"
+            onChange={changeTitle}
+            value={title}
+          />
+          <textarea
+            rows="10"
+            onChange={changeText}
+            value={text}
+            className="singlepost-text"
+          />
+          <p>Click to Change Status</p>
+
+          {published ? (
+            <p onClick={changeStatus} className="public">
+              publicado
+            </p>
+          ) : (
+            <p onClick={changeStatus} className="private">
+              no publicado
+            </p>
+          )}
+          <div>
+            <Button onClick={deletePost} color="danger">
+              Delete{" "}
+            </Button>
+          </div>
+          <input
+            type="submit"
+            onClick={savePost}
+            value="Save"
+            className="save-post"
+          />
+        </form>
+      </div>
+    )
   ) : (
     <div className="spinner">
       <Spinner color="primary" />

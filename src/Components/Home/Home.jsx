@@ -7,12 +7,15 @@ const Home = (props) => {
   const [posts, setPosts] = useState();
 
   const getPosts = async () => {
-    const response = await fetch("/admin/blog/all", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      "https://warm-ravine-05729.herokuapp.com/admin/blog/all",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const data = await response.json();
     setPosts(data);
   };

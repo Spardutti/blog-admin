@@ -1,7 +1,7 @@
 import Home from "./Components/Home/Home";
 import "./normalize.css";
 import Header from "./Components/Header/Header";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, HashRouter } from "react-router-dom";
 import Login from "./Components/Login/Login";
 import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
@@ -31,7 +31,7 @@ function App() {
   });
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div>
         <Header />
       </div>
@@ -45,7 +45,7 @@ function App() {
         <Route path="/post" component={SinglePost} />
         <Route path="/create" component={CreatePost} />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

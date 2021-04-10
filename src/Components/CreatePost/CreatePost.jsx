@@ -19,17 +19,20 @@ const CreatePost = (props) => {
 
   const createPost = async () => {
     const token = localStorage.getItem("token");
-    const response = await fetch("/admin/blog/new", {
-      method: "POST",
-      body: JSON.stringify({
-        title: title,
-        text: text,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    });
+    const response = await fetch(
+      "https://warm-ravine-05729.herokuapp.com/admin/blog/new",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          title: title,
+          text: text,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     const data = await response.json();
     if (response.status === 200) {
       history.push("/");
